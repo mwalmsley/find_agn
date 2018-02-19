@@ -45,5 +45,3 @@ def plot_overlaps(joint_catalog, heckman):
     fig.tight_layout()
     fig.savefig('heckman_v_joint.png')
     plt.clf()
-
-
