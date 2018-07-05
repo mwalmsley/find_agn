@@ -1,0 +1,10 @@
+.log
+node_modules
+*secret
+*secret.txt
+*.vscode
+*.ipynb_checkpoints
+*.idea
+*cache*
+*.ropeproject
+*__pycache__*
