@@ -3,6 +3,7 @@ pandas
 astropy  # may need tweaking
 matplotlib
 seaborn
+jupyter  # may need tweaking
 datashader
 bokeh
 holoviews

@@ -8,3 +8,4 @@ node_modules
 *cache*
 *.ropeproject
 *__pycache__*
+*.DS_Store
