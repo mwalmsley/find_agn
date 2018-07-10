@@ -4,6 +4,7 @@ astropy  # may need tweaking
 matplotlib
 seaborn
 jupyter  # may need tweaking
+scikit-learn
 datashader
 bokeh
 holoviews
