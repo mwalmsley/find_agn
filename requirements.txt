@@ -8,3 +8,4 @@ scikit-learn
 datashader
 bokeh
 holoviews
+pytest
