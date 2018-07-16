@@ -1,15 +1,11 @@
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import scipy
 from scipy.stats import skewnorm
-import scipy.interpolate
 
 import ezgal_wrapper
 
 
-def skew_normal(log_freq, loc, scale, skew, shift):
+def skew_normal(log_freq, loc, scale, skew):
     """Skewed normal distribution in log space, returned in linear space
 
     Args:
@@ -17,28 +13,14 @@ def skew_normal(log_freq, loc, scale, skew, shift):
         loc ([type]): [description]
         scale ([type]): [description]
         skew ([type]): [description]
-        shift ([type]): [description]
 
     Returns:
         np.array: Skewed normal distribution constructed in log space, returned in linear space
     """
-    return 10 ** (shift + skewnorm.pdf(log_freq, loc=loc, scale=scale, a=skew))
+    return 10 ** skewnorm.pdf(log_freq, loc=loc, scale=scale, a=skew)
 
 
-def log_torus_flux(log_freq, loc, scale, skew, shift):
-    return np.log10(skew_normal(log_freq, loc, scale, skew, shift))
-
-
-def log_disk_flux(log_freq, loc, scale, skew, shift):
-    return np.log10(skew_normal(log_freq, loc, scale, skew, shift))
-
-
-def double_skew_normal_model(log_freq, loc_a, scale_a, skew_a, shift_a, loc_b, scale_b, skew_b, shift_b):
-    # returns in linear space
-    return skew_normal(log_freq, loc_a, scale_a, skew_a, shift_a) + skew_normal(log_freq, loc_b, scale_b, skew_b, shift_b)
-
-
-def host_flux(log_freq_to_eval, log_shift): 
+def host_flux(log_freq_to_eval): 
     """
     Reproduce model 'normal' galaxy energy distribution
     Args:
@@ -60,28 +42,26 @@ def host_flux(log_freq_to_eval, log_shift):
 
     # interpolate simply to not worry about float eval errors and plotting
     # interpolate in linear space for simplicity (may look odd in log space)
-    energy_continuum = ezgal_wrapper.interpolate_energy(frequency=frequency, energy=energy)
+    energy_continuum = interpolate_energy(frequency=frequency, energy=energy)
     energy_continuum_values = energy_continuum(10 ** log_freq_to_eval)
-    # print(energy_continuum_values.max())
-
-    shift = 10 ** log_shift
-    # print(shift.max())
-
-    # shift is dwarfing the variation in energy
-    # I need to back up and fix the units so that the scale of the variation is appropriate
-
-    return energy_continuum_values + shift
+    return energy_continuum_values
 
 
-def log_host_flux(log_freq, log_shift):
-    """Evaluate host flux model and convert to log space.
-    Useful as a final model to fit/plot, but not in combination.
+def interpolate_energy(frequency, energy):
+    """Allow SED measured at distinct bands to be evaluated anywhere - but badly elsewhere
     
+    Purely for func evaluation convenience, not actual interp.
+    Should only be done on the fake galaxies
+
     Args:
-        log_freq (np.array): frequency to evaluate energy at, in log space
-        log_shift (float): shift to apply in log space, intended as a fitting parameter
+        frequency ([type]): [description]
+        energy ([type]): [description]
     
     Returns:
-        np.array: log energy at given log frequency, shifted in log space by log_shift
+        [type]: [description]
     """
-    return np.log10(host_flux(log_freq, log_shift))
+    assert len(energy) < 20  # intended to make coarse-grained eval not crash, not be 'real' interp
+    return scipy.interpolate.interp1d(
+        frequency,
+        energy,
+        kind='linear')  # should be obviously bad if evaluated incorrectly

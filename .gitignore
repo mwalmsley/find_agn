@@ -9,3 +9,4 @@ node_modules
 *.ropeproject
 *__pycache__*
 *.DS_Store
+*.model

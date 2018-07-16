@@ -37,54 +37,51 @@ def seyfert():
     )
 
 
+# @pytest.fixture()
+# def starforming():
+#     return pd.Series(
+#         {
+#             'F_FLUX_ABSOLUTE': 2004529000.0,
+#             'N_FLUX_ABSOLUTE': 1813295400.0,
+#             'U_FLUX_ABSOLUTE': 33691814000.0,
+#             'G_FLUX_ABSOLUTE': 84510610000.0,
+#             'R_FLUX_ABSOLUTE': 144881060000.0,
+#             'I_FLUX_ABSOLUTE': 201967520000.0,
+#             'Z_FLUX_ABSOLUTE': 225130100000.0,
+#             'Y_FLUX_ABSOLUTE': 103771341518.61148,
+#             'J_FLUX_ABSOLUTE': 169230051303.45352,
+#             'H_FLUX_ABSOLUTE': 307948502445.84216,
+#             'K_FLUX_ABSOLUTE': 405581382265.4065,
+#             'W1_FLUX_ABSOLUTE': 257383093951.31976,
+#             'W2_FLUX_ABSOLUTE': 155759118043.81952,
+#             'W3_FLUX_ABSOLUTE': 876932273541.0438,
+#             'W4_FLUX_ABSOLUTE': 2164837270796.9597
+#         }
+#     )
+
+
 @pytest.fixture()
-def starforming():
-    return pd.Series(
-        {
-            'F_FLUX_ABSOLUTE': 2004529000.0,
-            'N_FLUX_ABSOLUTE': 1813295400.0,
-            'U_FLUX_ABSOLUTE': 33691814000.0,
-            'G_FLUX_ABSOLUTE': 84510610000.0,
-            'R_FLUX_ABSOLUTE': 144881060000.0,
-            'I_FLUX_ABSOLUTE': 201967520000.0,
-            'Z_FLUX_ABSOLUTE': 225130100000.0,
-            'Y_FLUX_ABSOLUTE': 103771341518.61148,
-            'J_FLUX_ABSOLUTE': 169230051303.45352,
-            'H_FLUX_ABSOLUTE': 307948502445.84216,
-            'K_FLUX_ABSOLUTE': 405581382265.4065,
-            'W1_FLUX_ABSOLUTE': 257383093951.31976,
-            'W2_FLUX_ABSOLUTE': 155759118043.81952,
-            'W3_FLUX_ABSOLUTE': 876932273541.0438,
-            'W4_FLUX_ABSOLUTE': 2164837270796.9597
-        }
-    )
+def reference_galaxy(seyfert):
+    sed = notebook_utils.get_spectral_energy(seyfert)
+    freq = np.log10(sed['frequency'])
+    energy = np.log10(sed['energy'])
+    return freq, energy
 
-
-def test_torus_model(seyfert):
+def test_skew_normal_model(reference_galaxy):
     log_freq = np.linspace(13, 14.5)
-    plt.plot(log_freq, agn_models.log_torus_flux(log_freq, 14., .3, 1., 25.5))
+    plt.plot(log_freq, np.log10(agn_models.skew_normal(log_freq, 14., .3, 1.)))
 
-    sed = notebook_utils.get_spectral_energy(seyfert)
-    freq = np.log10(sed['frequency'])
-    energy = np.log10(sed['energy'])
-    plt.plot(freq, energy, 'ro')
+    log_ref_freq, log_ref_energy = reference_galaxy
+    plt.plot(log_ref_freq, log_ref_energy - 25, 'ro')
     plt.savefig('test_figures/test_torus_model.png')
-    plt.clf()
+    # we expect the model to have a recognisable shape vs. the galaxy, at a significant y offset
+    plt.clf() 
 
-def test_disk_model(seyfert):
-    log_freq = np.linspace(13, 15.5)
-    plt.plot(log_freq, agn_models.log_disk_flux(log_freq, 14.5, .3, 1., 25.1))
-
-    sed = notebook_utils.get_spectral_energy(seyfert)
-    freq = np.log10(sed['frequency'])
-    energy = np.log10(sed['energy'])
-    plt.plot(freq, energy, 'ro')
-    plt.savefig('test_figures/test_disk_model.png')
-    plt.clf()
-
-
-def test_host_model(seyfert):
+def test_host_model(reference_galaxy):
     x = np.logspace(13.5, 15., 100)  # logspace is oddly spaced linear space of 10 ** edges
     log_x = np.log10(x)
-    plt.plot(log_x, agn_models.log_host_flux(log_x, 2))
+    plt.plot(log_x, np.log10(agn_models.host_flux(log_x)))
+    # we expect the model to have a recognisable shape vs. the galaxy, at a significant y offset
+    log_ref_freq, log_ref_energy = reference_galaxy
+    plt.plot(log_ref_freq, log_ref_energy - 10, 'ro')
     plt.savefig('test_figures/test_host_model.png')
