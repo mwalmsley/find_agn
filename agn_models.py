@@ -49,14 +49,14 @@ def host_flux(log_freq_to_eval):
 
 def interpolate_energy(frequency, energy):
     """Allow SED measured at distinct bands to be evaluated anywhere - but badly elsewhere
-    
+
     Purely for func evaluation convenience, not actual interp.
     Should only be done on the fake galaxies
 
     Args:
         frequency ([type]): [description]
         energy ([type]): [description]
-    
+
     Returns:
         [type]: [description]
     """

@@ -65,7 +65,7 @@ def fit_host_model_to_spectral_data(log_freq, log_energy, visualise=True):
         'shift_for_host': 0,
     }
 
-    fitfunc = lambda p, x: agn_models.log_host_flux(x) + p[0]
+    fitfunc = lambda p, x: np.log10(host_wrapper(p, x, index_of_param))
 
     errfunc = lambda p, x, y: fitfunc(p, x) - y  # y distance in log space
     best_fit, _ = scipy.optimize.leastsq(errfunc, initial_guess, args=(log_freq, log_energy))
