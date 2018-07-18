@@ -12,7 +12,33 @@ import notebook_utils
 sys.path.insert(0,'/data/repos/find_agn/easyGalaxy')  # cloned locally because pypi not updated
 import ezgal  # linting error - does work
 
+ALL_BANDS = [
+    'galex_fuv',
+    'galex_nuv',
+    'sloan_u',
+    'sloan_g',
+    'sloan_r',
+    'sloan_i',
+    'sloan_z',
+    'ukidss_y',
+    'ukidss_j',
+    'ukidss_h',
+    'ukidss_k',
+    'wise_ch1',
+    'wise_ch2',
+    'wise_ch3',
+    'wise_ch4'
+]
 
+BAND_SUBSET = [
+    'galex_fuv',
+    'galex_nuv',
+    'sloan_g',
+    'sloan_r',
+    'ukidss_k',
+    'wise_ch1',
+    'wise_ch4'
+] 
 
 def get_fake_galaxy(model, formation_z, current_z, mass):
     """Wrapper to get galaxy magnitudes from an ezgal model and convert to standard table format
@@ -97,53 +123,62 @@ def get_model(model_loc, star_formation):
 
     # This MUST match the order of notebook_utils.all_bands. Different names, so hard to check.
     # Filters must be added after make_csp because make_csp does not preserve any prev. filters
-    useful_bands = [
-        'galex_fuv',
-        'galex_nuv',
-        'sloan_u',
-        'sloan_g',
-        'sloan_r',
-        'sloan_i',
-        'sloan_z',
-        'ukidss_y',
-        'ukidss_j',
-        'ukidss_h',
-        'ukidss_k',
-        'wise_ch1',
-        'wise_ch2',
-        'wise_ch3',
-        'wise_ch4'
-    ]
-    for band in useful_bands:
+
+    for band in ALL_BANDS:
         model.add_filter(band)
 
     return model
 
 
-def get_normalised_model_continuum(model, galaxy):
-
-    latest_age = cosmo.age(galaxy['z']).value - cosmo.age(galaxy['formation_z']).value  # Gyrs
-    sed = model.get_sed(latest_age, units='Fv')
-
+def get_normalised_model_continuum(model, galaxy, observed=False):
+    """[summary]
+    
+    Args:
+        model ([type]): [description]
+        galaxy ([type]): [description]
+        observed (bool, optional): Defaults to False. [description]
+    
+    Returns:
+        [type]: [description]
+    """
+    # latest_age = cosmo.age(galaxy['z']).value - cosmo.age(galaxy['formation_z']).value  # Gyrs
+    # sed = model.get_sed(latest_age, units='Fv')
+    freq, sed = model.get_sed_z(
+        galaxy['formation_z'], 
+        galaxy['z'], 
+        units='Fv', 
+        observed=observed,
+        return_frequencies=True
+        )
     energy_from_mags = notebook_utils.get_spectral_energy(galaxy)['energy']
-    energy_from_sed = sed * model.vs
+    # freq = model.vs
+    energy_from_sed = sed * freq
     sed_log_offset = np.max(np.log10(energy_from_mags) - np.max(np.log10(energy_from_sed)))
 
     return {
-        'frequency': model.vs,  # defined at 6900 places
-        'energy': 10 ** (np.log10(energy_from_sed) + sed_log_offset)  # constant
+        'frequency': freq,  # defined at 6900 places. Hz.
+        'energy': 10 ** (np.log10(energy_from_sed) + sed_log_offset),  # Fv Hz i.e. erg s-1
+        'wavelength': 299792458 / freq  # lambda (m) = c (ms^1) / freq (Hz)
     }
 
 
-def save_model(model, save_dir, formation_z, current_z, mass):
+def save_template(model, save_dir, formation_z, current_z, mass=1.):
+    """Save galaxy and continuum templates from EZGAL model at defined formation_z, current_z.
+    Model SF history MUST match formation_z, current_z. TODO: enforce consistency
 
+    Args:
+        model (ezgal.ezgal.ezgal): EZGAL model stellar population of 1 Msun
+        save_dir (str): path to directory into which to save templates
+        formation_z (float): formation redshift of template. Must match model SF history.
+        current_z (float): current redshift of template. Must match model SF history
+        mass (float): mass of template to save. Default: 1. Later rescaling of galaxy is trivial.
+    """
     galaxy = get_fake_galaxy(model, formation_z, current_z, mass)
 
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
 
-    galaxy_loc, sed_loc = get_saved_model_locs(save_dir, formation_z, current_z, mass)
-    print(galaxy_loc, sed_loc)
+    galaxy_loc, sed_loc = get_saved_template_locs(save_dir, formation_z, current_z, mass)
 
     with open(galaxy_loc, 'w') as f:
         json.dump(galaxy.to_dict(), f)
@@ -157,7 +192,32 @@ def save_model(model, save_dir, formation_z, current_z, mass):
         json.dump(sed, f)
 
 
-def get_saved_model_locs(save_dir, formation_z, current_z, mass):
+def load_saved_template(save_dir, formation_z, current_z, mass):
+    """Load saved galaxy and continuum templates from EZGAL model at defined formation_z, current_z.
+
+    Args:
+        model (ezgal.ezgal.ezgal): EZGAL model stellar population of 1 Msun
+        save_dir (str): path to directory from which to load templates
+        formation_z (float): formation redshift of template. Must match model SF history.
+        current_z (float): current redshift of template. Must match model SF history
+        mass (float): mass of template to save. Default: 1. Later rescaling of galaxy is trivial.
+
+    Return:
+        pd.Series: template galaxy in standard format
+        dict: of form {frequency, energy at frequency} for template continuum
+    """
+    galaxy_loc, sed_loc = get_saved_template_locs(save_dir, formation_z, current_z, mass)
+
+    with open(galaxy_loc, 'r') as galaxy_f:
+        galaxy = json.load(galaxy_f)
+
+    with open(sed_loc, 'r') as continuum_f:
+        continuum = json.load(continuum_f)
+
+    return galaxy, continuum
+
+
+def get_saved_template_locs(save_dir, formation_z, current_z, mass):
     param_string = 'fz_{:.3}_cz_{:.3}_m_{}'.format(formation_z, current_z, mass)
     galaxy_loc = os.path.join(save_dir, param_string + '_galaxy.txt')
     sed_loc = os.path.join(save_dir, param_string + '_sed.txt')

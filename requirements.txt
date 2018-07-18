@@ -9,3 +9,4 @@ datashader
 bokeh
 holoviews
 pytest
+pyspecfit
