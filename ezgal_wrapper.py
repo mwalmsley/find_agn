@@ -143,6 +143,7 @@ def save_model(model, save_dir, formation_z, current_z, mass):
         os.mkdir(save_dir)
 
     galaxy_loc, sed_loc = get_saved_model_locs(save_dir, formation_z, current_z, mass)
+    print(galaxy_loc, sed_loc)
 
     with open(galaxy_loc, 'w') as f:
         json.dump(galaxy.to_dict(), f)
@@ -157,7 +158,7 @@ def save_model(model, save_dir, formation_z, current_z, mass):
 
 
 def get_saved_model_locs(save_dir, formation_z, current_z, mass):
-    param_string = 'fz_{}_cz_{}_m_{}'.format(formation_z, current_z, mass)
+    param_string = 'fz_{:.3}_cz_{:.3}_m_{}'.format(formation_z, current_z, mass)
     galaxy_loc = os.path.join(save_dir, param_string + '_galaxy.txt')
     sed_loc = os.path.join(save_dir, param_string + '_sed.txt')
     return galaxy_loc, sed_loc
