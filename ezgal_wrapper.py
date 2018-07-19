@@ -141,24 +141,22 @@ def get_normalised_model_continuum(model, galaxy, observed=False):
     Returns:
         [type]: [description]
     """
-    # latest_age = cosmo.age(galaxy['z']).value - cosmo.age(galaxy['formation_z']).value  # Gyrs
-    # sed = model.get_sed(latest_age, units='Fv')
-    freq, sed = model.get_sed_z(
-        galaxy['formation_z'], 
-        galaxy['z'], 
-        units='Fv', 
+    freq, sed = model.get_sed_z(  # flux density Fv (energy/area/time/photon for each frequency v)
+        galaxy['formation_z'],
+        galaxy['z'],
+        units='Fv',  # in Jy (I think) i.e. 10^-23 erg / s / cm^2 / Hz
         observed=observed,
         return_frequencies=True
         )
     energy_from_mags = notebook_utils.get_spectral_energy(galaxy)['energy']
-    # freq = model.vs
-    energy_from_sed = sed * freq
+    energy_from_sed = sed * freq  # energy density v Fv i.e. 10^-23 erg / s / cm^2
     sed_log_offset = np.max(np.log10(energy_from_mags) - np.max(np.log10(energy_from_sed)))
 
     return {
         'frequency': freq,  # defined at 6900 places. Hz.
-        'energy': 10 ** (np.log10(energy_from_sed) + sed_log_offset),  # Fv Hz i.e. erg s-1
-        'wavelength': 299792458 / freq  # lambda (m) = c (ms^1) / freq (Hz)
+        'wavelength': 299792458 / freq,  # lambda (m) = c (ms^1) / freq (Hz)
+        'flux_density': sed,  # not shifted in any way
+        'energy_density': 10 ** (np.log10(energy_from_sed) + sed_log_offset)  # add a log shift
     }
 
 
@@ -186,8 +184,9 @@ def save_template(model, save_dir, formation_z, current_z, mass=1.):
     sed = get_normalised_model_continuum(model, galaxy)
 
     # cannot serialise np array, only simple lists
-    sed['frequency'] = list(sed['frequency'])
-    sed['energy'] = list(sed['energy'])
+    for key, data in sed.items():
+        if isinstance(data, np.ndarray):
+            sed[key] = list(data)
     with open(sed_loc, 'w') as f:
         json.dump(sed, f)
 
