@@ -137,3 +137,12 @@ def plot_spectral_energy(data, ax=None, add_labels=False):
 def add_band_labels(data, ax, y=28.5):
     for band_n, band in enumerate(all_bands):
         ax.text(x=np.log10(data['frequency'][band_n]), y=y, s=band)
+
+
+def add_bpt_parameters(df):
+    # works on both series and dataframe
+    df['log_OIII_HB'] = np.log10(df['OIII_5006'] / df['HB_4861'])
+    df['log_NII_HA'] = np.log10(df['NII_6583'] / df['HA_6562'])
+    df['log_SII_HA'] = np.log10(df['SII_6716'] / df['HA_6562'])
+    df['log_OI_HA'] = np.log10(df['OI_6300'] / df['HA_6562'])
+    return df

@@ -1,7 +1,5 @@
 """Fit galaxy spectra to find emission lines
 """
-
-
 import os
 
 import numpy as np
@@ -50,8 +48,19 @@ TARGET_LINES = [
 
 
 def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
+    """[summary]
+    
+    Args:
+        raw_spectral_data ([type]): [description]
+        data_loc ([type], optional): Defaults to None. [description]
+        figure_loc ([type], optional): Defaults to None. [description]
+    
+    Returns:
+        [type]: [description]
+    """
 
-    spectral_data = prepare_spectral_data(raw_spectral_data, normalisation=1e24)
+
+    spectral_data = prepare_spectral_data(raw_spectral_data.copy(), normalisation=1e24)
 
     spec_object = load_spectrum(
         spectral_data['wavelength'].values,
