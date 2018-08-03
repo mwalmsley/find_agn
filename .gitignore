@@ -9,9 +9,10 @@ node_modules
 *.ropeproject
 *__pycache__*
 *.DS_Store
-*.model
 models/ezgal_models/index.html
 *.csv
 *.html
 population_models
 easyGalaxy/*
+!find_agn/tests/test_examples
+!find_agn/tests/test_figures

@@ -5,7 +5,7 @@ import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
 
-import find_agn.agn_models
+from find_agn import agn_models
 
 
 def fit_agn_model_to_spectral_data(log_freq, log_energy, visualise=True):
