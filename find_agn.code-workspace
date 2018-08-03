@@ -5,6 +5,6 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "/Users/mikewalmsley/anaconda3/envs/py36/bin/python"
+		"python.pythonPath": "/anaconda3/envs/py36/bin/python"
 	}
 }

@@ -10,3 +10,5 @@ bokeh
 holoviews
 pytest
 pyspeckit
+statsmodels
+pytest-cov

@@ -5,12 +5,13 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
-import ezgal_wrapper
-import star_formation
+from find_agn import ezgal_wrapper, star_formation
+from find_agn.tests import TEST_EXAMPLE_DIR, TEST_FIGURE_DIR
+
 
 @pytest.fixture()
 def reference_model_loc():
-    return 'test_figures/bc03_ssp_z_0.02_salp.model'
+    return TEST_EXAMPLE_DIR + '/bc03_ssp_z_0.02_salp.model'
 
 @pytest.fixture()
 def formation_z():
@@ -20,11 +21,9 @@ def formation_z():
 def ref_exponential():
     return star_formation.exponential_sfh(tau=1.0)
 
-
 @pytest.fixture()
 def ref_burst():
     return star_formation.constant_burst_sfh(start_age=3., end_age=5.)
-
 
 @pytest.fixture()
 def ref_dual_burst(formation_z):
@@ -46,7 +45,7 @@ def test_star_formation_profiles(formation_z, ref_exponential, ref_burst, ref_du
     plt.ylabel('Relative Star Formation')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('test_figures/star_formation_profiles.png')
+    plt.savefig(TEST_FIGURE_DIR + '/star_formation_profiles.png')
 
 
 def test_exponential_sfh_model(reference_model_loc, ref_exponential):
@@ -58,7 +57,7 @@ def test_exponential_sfh_model(reference_model_loc, ref_exponential):
         model_name='Tau = 1.0 Gyr',
         formation_z=formation_z)
 
-    fig.savefig('test_figures/exponential_sfh_model.png')
+    fig.savefig(TEST_FIGURE_DIR + '/exponential_sfh_model.png')
 
 
 def test_constant_burst_sfh_model(reference_model_loc, ref_burst):
@@ -70,7 +69,7 @@ def test_constant_burst_sfh_model(reference_model_loc, ref_burst):
         model_name='Burst',
         formation_z=formation_z)
 
-    fig.savefig('test_figures/constant_burst_sfh_model.png')
+    fig.savefig(TEST_FIGURE_DIR + '/constant_burst_sfh_model.png')
 
 
 def test_dual_burst_sfh_model(reference_model_loc, ref_dual_burst, formation_z):
@@ -81,4 +80,4 @@ def test_dual_burst_sfh_model(reference_model_loc, ref_dual_burst, formation_z):
         model_name='Dual Burst',
         formation_z=formation_z)
 
-    fig.savefig('test_figures/dual_burst_sfh_model.png')
+    fig.savefig(TEST_FIGURE_DIR + '/dual_burst_sfh_model.png')

@@ -8,7 +8,8 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.interpolate import interp1d
 
 from astropy.cosmology import WMAP9 as cosmo
-import ezgal_wrapper
+
+from find_agn import ezgal_wrapper
 
 
 def exponential_sfh(tau):
@@ -24,7 +25,7 @@ def exponential_sfh(tau):
     return lambda galaxy_age: np.exp(-1.0 * galaxy_age / tau)  # expects age in Gyrs
 
 
-def constant_burst_sfh(start_age, end_age, relative_peak=1.):
+def constant_burst_sfh(start_age, end_age, relative_peak=1., sigma=1000.):
     """Get function describing star formation at age (Gyrs)
     for a population with a constant star formation
     history between start_age and end_age
@@ -33,6 +34,7 @@ def constant_burst_sfh(start_age, end_age, relative_peak=1.):
         start_age (np.array): start time of burst (Gyrs)
         end_age (np.array): end time of burst (Gyrs)
         relative_peak (float, optional): Defaults to 1.. Level of burst SF (EZGAL will normalise)
+        sigma (float): width of smoothing filter. High values cause smoother histories.
 
     Returns:
         function: get relative star formation rate when called with age (Gyrs)
@@ -40,7 +42,7 @@ def constant_burst_sfh(start_age, end_age, relative_peak=1.):
     age_samples = np.linspace(0., 20., 10000)  # EZGAL age always 0-20
     star_formation_samples = np.zeros_like(age_samples)
     star_formation_samples[(age_samples >= start_age) & (age_samples <= end_age)] = relative_peak
-    smoothed_sf_samples = gaussian_filter1d(star_formation_samples, sigma=50.)
+    smoothed_sf_samples = gaussian_filter1d(star_formation_samples, sigma=sigma)
     return interp1d(age_samples, smoothed_sf_samples)
 
 

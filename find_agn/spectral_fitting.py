@@ -12,7 +12,7 @@ from astropy import units
 import pyspeckit
 from scipy.interpolate import interp1d
 
-from scratch import copy_to_dummy_ax
+from find_agn.plotting_temp_utils import copy_to_dummy_ax
 
 
 TARGET_LINES = [
@@ -21,7 +21,7 @@ TARGET_LINES = [
         'wavelength': 4861.
     },
     {
-        'name': 'OIII',
+        'name': 'OIIIb',
         'wavelength': 5006.
     },
     {
@@ -29,7 +29,7 @@ TARGET_LINES = [
         'wavelength': 6300.
     },
     {
-        'name': 'NII',
+        'name': 'NIIb',
         'wavelength': 6583.
     },
     {
@@ -37,7 +37,7 @@ TARGET_LINES = [
         'wavelength': 6562.
     },
     {
-        'name': 'SII',
+        'name': 'SIIa',
         'wavelength': 6716.
     },
     {
@@ -78,7 +78,7 @@ def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
 
         plot_lines_in_range(spec_object.copy(), fig, axes_lower[0], 6450, 6775)
         plot_lines_in_range(spec_object.copy(), fig, axes_lower[1], 4830, 5100)
-        fig.savefig(os.path.join(figure_dir, debug_figure_loc))
+        fig.savefig(figure_loc)
 
     # TODO cannot save tight layout figure because copied axes are not truly subplots
     # They are simply set to the same location with get_position()

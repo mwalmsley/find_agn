@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 from scipy.stats import skewnorm
 
-import ezgal_wrapper
+# import find_agn.ezgal_wrapper
 
 
 def skew_normal(log_freq, loc, scale, skew):

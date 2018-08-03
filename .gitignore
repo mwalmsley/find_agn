@@ -12,3 +12,5 @@ node_modules
 *.model
 models/ezgal_models/index.html
 *.csv
+*.html
+population_models

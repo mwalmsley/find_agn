@@ -5,12 +5,9 @@ import json
 import numpy as np
 import pandas as pd
 
-from astropy.cosmology import WMAP9 as cosmo
+from find_agn import notebook_utils
 
-import notebook_utils
-
-sys.path.insert(0,'/data/repos/find_agn/easyGalaxy')  # cloned locally because pypi not updated
-import ezgal  # linting error - does work
+import easyGalaxy.ezgal  # linting error - does work
 
 ALL_BANDS = [
     'galex_fuv',
@@ -117,7 +114,7 @@ def get_model(model_loc, star_formation):
         ezgal.ezgal.ezgal: model for the evolution over `z` of that stellar population
     """
 
-    default_model = ezgal.model(model_loc)
+    default_model = easyGalaxy.ezgal.model(model_loc)
 
     model =  default_model.make_csp(star_formation)  # apply custom star formation history
 
