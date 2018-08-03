@@ -1,4 +1,12 @@
 numpy
 pandas
 astropy  # may need tweaking
-'holoviews[recommended]'
+matplotlib
+seaborn
+jupyter  # may need tweaking
+scikit-learn
+datashader
+bokeh
+holoviews
+pytest
+pyspecfit

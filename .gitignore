@@ -1,0 +1,14 @@
+.log
+node_modules
+*secret
+*secret.txt
+*.vscode
+*.ipynb_checkpoints
+*.idea
+*cache*
+*.ropeproject
+*__pycache__*
+*.DS_Store
+*.model
+models/ezgal_models/index.html
+*.csv
