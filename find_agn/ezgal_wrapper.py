@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 
 import numpy as np
 import pandas as pd
@@ -131,9 +130,9 @@ def get_normalised_model_continuum(model, galaxy, observed=False):
     """[summary]
     
     Args:
-        model ([type]): [description]
-        galaxy ([type]): [description]
-        observed (bool, optional): Defaults to False. [description]
+        model (ezgal.ezgal.ezgal): ezgal model
+        galaxy (dict): with calculated ezgal model, formation_z, z, 
+        observed (bool, optional): Defaults to False. If True, return continuum in observed frame.
     
     Returns:
         [type]: [description]
@@ -156,65 +155,5 @@ def get_normalised_model_continuum(model, galaxy, observed=False):
         'energy_density': 10 ** (np.log10(energy_from_sed) + sed_log_offset)  # add a log shift
     }
 
-
-def save_template(model, save_dir, formation_z, current_z, mass=1.):
-    """Save galaxy and continuum templates from EZGAL model at defined formation_z, current_z.
-    Model SF history MUST match formation_z, current_z. TODO: enforce consistency
-
-    Args:
-        model (ezgal.ezgal.ezgal): EZGAL model stellar population of 1 Msun
-        save_dir (str): path to directory into which to save templates
-        formation_z (float): formation redshift of template. Must match model SF history.
-        current_z (float): current redshift of template. Must match model SF history
-        mass (float): mass of template to save. Default: 1. Later rescaling of galaxy is trivial.
-    """
-    galaxy = get_fake_galaxy(model, formation_z, current_z, mass)
-
-    if not os.path.isdir(save_dir):
-        os.mkdir(save_dir)
-
-    galaxy_loc, sed_loc = get_saved_template_locs(save_dir, formation_z, current_z, mass)
-
-    with open(galaxy_loc, 'w') as f:
-        json.dump(galaxy.to_dict(), f)
-
-    sed = get_normalised_model_continuum(model, galaxy)
-
-    # cannot serialise np array, only simple lists
-    for key, data in sed.items():
-        if isinstance(data, np.ndarray):
-            sed[key] = list(data)
-    with open(sed_loc, 'w') as f:
-        json.dump(sed, f)
-
-
-def load_saved_template(save_dir, formation_z, current_z, mass):
-    """Load saved galaxy and continuum templates from EZGAL model at defined formation_z, current_z.
-
-    Args:
-        model (ezgal.ezgal.ezgal): EZGAL model stellar population of 1 Msun
-        save_dir (str): path to directory from which to load templates
-        formation_z (float): formation redshift of template. Must match model SF history.
-        current_z (float): current redshift of template. Must match model SF history
-        mass (float): mass of template to save. Default: 1. Later rescaling of galaxy is trivial.
-
-    Return:
-        pd.Series: template galaxy in standard format
-        dict: of form {frequency, energy at frequency} for template continuum
-    """
-    galaxy_loc, sed_loc = get_saved_template_locs(save_dir, formation_z, current_z, mass)
-
-    with open(galaxy_loc, 'r') as galaxy_f:
-        galaxy = json.load(galaxy_f)
-
-    with open(sed_loc, 'r') as continuum_f:
-        continuum = json.load(continuum_f)
-
-    return galaxy, continuum
-
-
-def get_saved_template_locs(save_dir, formation_z, current_z, mass):
-    param_string = 'fz_{:.3}_cz_{:.3}_m_{}'.format(formation_z, current_z, mass)
-    galaxy_loc = os.path.join(save_dir, param_string + '_galaxy.txt')
-    sed_loc = os.path.join(save_dir, param_string + '_sed.txt')
-    return galaxy_loc, sed_loc
+def bc03_model_name(metallicity=0.05, sfh='ssp', imf='salp'):
+    return 'bc03_{}_z_{}_{}.model'.format(sfh, metallicity, imf)

@@ -19,15 +19,15 @@ def formation_z():
 
 @pytest.fixture()
 def ref_exponential():
-    return star_formation.exponential_sfh(tau=1.0)
+    return star_formation.ExponentialHistory(tau=1.0)
 
 @pytest.fixture()
 def ref_burst():
-    return star_formation.constant_burst_sfh(start_age=3., end_age=5.)
+    return star_formation.ConstantBurstHistory(start_age=3., end_age=5.)
 
 @pytest.fixture()
 def ref_dual_burst(formation_z):
-    return star_formation.dual_burst_sfh(
+    return star_formation.DualBurstHistory(
         current_z=0.05,
         formation_z=formation_z,
         first_duration=1.,

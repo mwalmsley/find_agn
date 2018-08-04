@@ -8,6 +8,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from astropy.cosmology import z_at_value
+from astropy.cosmology import WMAP9 as cosmo
 from astropy import units
 
 ordered_sdss_bands = ['F', 'N', 'U', 'G', 'R', 'I', 'Z']
@@ -68,6 +70,29 @@ def wise_mag_to_flux(mags, band):
     }
 
     return zero_mag_flux_densities[band] * np.power(10., -mags/2.5)
+
+
+
+def formation_redshift_for_fixed_age(current_z, current_galaxy_age):
+    """Find the formation redshift for a galaxy of a given redshift and current age
+    Useful to set the formation redshift for starburst models to correspond to
+    a desired galaxy age
+    TODO what type is astropy Gyr units?
+    Args:
+        current_z (float): current redshift of galaxy
+        current_galaxy_age (astropy.Quantity): current age of galaxy. Note: Astropy units!
+    
+    Returns:
+        float: formation redshift of galaxy such that it has current age at current redshift
+    """
+    universe_age_at_current_redshift = cosmo.age(current_z)
+    assert universe_age_at_current_redshift > 12 * units.Gyr
+    universe_age_at_formation_redshift = universe_age_at_current_redshift - current_galaxy_age
+    assert universe_age_at_formation_redshift < 6 * units.Gyr
+    formation_z = z_at_value(cosmo.age, universe_age_at_formation_redshift)
+    assert formation_z > 1
+    return formation_z
+
 
 
 def get_spectral_energy(galaxy):
