@@ -101,7 +101,7 @@ def ezgal_magnitudes_to_galaxy(magnitudes):
 
 
 
-def get_model(model_loc, star_formation):
+def get_model(model_loc, star_formation, formation_z):
     """Load an ezgal stellar population model. 
     Add useful filters to measure e.g. magsby default.
 
@@ -123,37 +123,10 @@ def get_model(model_loc, star_formation):
     for band in ALL_BANDS:
         model.add_filter(band)
 
+    model.set_zfs([formation_z])
+
     return model
 
-
-def get_normalised_model_continuum(model, galaxy, observed=False):
-    """[summary]
-    
-    Args:
-        model (ezgal.ezgal.ezgal): ezgal model
-        galaxy (dict): with calculated ezgal model, formation_z, z, 
-        observed (bool, optional): Defaults to False. If True, return continuum in observed frame.
-    
-    Returns:
-        [type]: [description]
-    """
-    freq, sed = model.get_sed_z(  # flux density Fv (energy/area/time/photon for each frequency v)
-        galaxy['formation_z'],
-        galaxy['z'],
-        units='Fv',  # in Jy (I think) i.e. 10^-23 erg / s / cm^2 / Hz
-        observed=observed,
-        return_frequencies=True
-        )
-    energy_from_mags = notebook_utils.get_spectral_energy(galaxy)['energy']
-    energy_from_sed = sed * freq  # energy density v Fv i.e. 10^-23 erg / s / cm^2
-    sed_log_offset = np.max(np.log10(energy_from_mags) - np.max(np.log10(energy_from_sed)))
-
-    return {
-        'frequency': freq,  # defined at 6900 places. Hz.
-        'wavelength': 299792458 / freq,  # lambda (m) = c (ms^1) / freq (Hz)
-        'flux_density': sed,  # not shifted in any way
-        'energy_density': 10 ** (np.log10(energy_from_sed) + sed_log_offset)  # add a log shift
-    }
 
 def bc03_model_name(metallicity=0.05, sfh='ssp', imf='salp'):
     return 'bc03_{}_z_{}_{}.model'.format(sfh, metallicity, imf)

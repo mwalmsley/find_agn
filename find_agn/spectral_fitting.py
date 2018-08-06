@@ -1,7 +1,5 @@
 """Fit galaxy spectra to find emission lines
 """
-import os
-
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -60,7 +58,8 @@ def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
     """
 
 
-    spectral_data = prepare_spectral_data(raw_spectral_data.copy(), normalisation=1e24)
+    spectral_data = sanity_check_spectral_data(raw_spectral_data.copy(), normalisation=1e24)
+    spectral_data = fit_background(spectral_data)
 
     spec_object = load_spectrum(
         spectral_data['wavelength'].values,
@@ -89,36 +88,43 @@ def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
     return line_data
 
 
-def prepare_spectral_data(spectrum, normalisation=1.):
-    """
-    Normalise and trim spectrum
-    Estimate continuum emission (excluding Ha) and save as 'continuum_flux_density'
-    Subtract raw flux from continuum emission and save as 'flux_density_subtracted'
-
+def sanity_check_spectral_data(spectrum, normalisation=1.):
+    """Normalise and trim spectrum
+    
     Args:
-        spectrum (pd.DataFrame): spectral data, form {wavelength: np.array, flux_density: np.array}
-
+        spectrum ([type]): [description]
+        normalisation ([type], optional): Defaults to 1.. [description]
+    
     Returns:
-        pd.DataFrame: rescaled/trimmed spectral data with continuum flux estimated and subtracted
+        [type]: [description]
     """
+
     wavelength = spectrum['wavelength'].values
-    assert wavelength.mean() < 10000 and wavelength.mean() > 1000  # should be in angstroms
+    assert wavelength.mean() < 20000 and wavelength.mean() > 1000  # should be in angstroms
 
     # normalise to sane absolute values
     spectrum['flux_density'] = spectrum['flux_density'] * normalisation
     assert np.max(spectrum['flux_density']) < 1e5
     assert np.min(spectrum['flux_density']) > 1e-5
 
-    xmin = 4830
-    xmax = 6800
-    spectrum = spectrum[
-        (spectrum['wavelength'] > xmin) &
-        (spectrum['wavelength'] < xmax)
-    ]
+    return spectrum
 
+
+def fit_background(spectrum, smoothing_frac=0.12):
+    """[summary]
+    
+    Args:
+        spectrum ([type]): [description]
+    
+    Returns:
+        pd.DataFrame: [description]
+    """
     # fit continuum from spectrum, excluding the Ha region
-    continuum = fit_lowess_continuum(spectrum, excluded=[(6562-10, 6562+10)])
-
+    continuum = fit_lowess_continuum(
+        spectrum, 
+        smoothing_frac,
+        excluded=[(6562-10, 6562+10)])
+    # continuum is not returned
     spectrum['continuum_flux_density'] = continuum(spectrum['wavelength'])
     spectrum['flux_density_subtracted'] = spectrum['continuum_flux_density'] - \
         spectrum['flux_density']
@@ -126,7 +132,7 @@ def prepare_spectral_data(spectrum, normalisation=1.):
     return spectrum
 
 
-def fit_lowess_continuum(input_spec, filter_range=None, excluded=None):
+def fit_lowess_continuum(input_spec, smoothing_frac, filter_range=None, excluded=None):
     """Estimate the continuum emission of a spectra using local regression.
 
     Args:
@@ -158,7 +164,7 @@ def fit_lowess_continuum(input_spec, filter_range=None, excluded=None):
     spec_to_fit = spec_to_fit.sort_values('wavelength')
 
     continuum = lowess(
-        spec_to_fit['flux_density'], spec_to_fit['wavelength'], is_sorted=True, frac=.12)
+        spec_to_fit['flux_density'], spec_to_fit['wavelength'], is_sorted=True, frac=smoothing_frac)
     continuum_model = interp1d(
         continuum[:, 0], continuum[:, 1], kind='quadratic')
 

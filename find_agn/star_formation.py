@@ -22,8 +22,10 @@ class ExponentialHistory():
         """
 
         self.tau = tau
+        self.history = self.get_history_lambda()  # only calculate the lambda once for speed
 
-    def __call__(self):
+
+    def get_history_lambda(self):
         """Get the star formation history at each age for a population with an exponential
         star forming history with decay time tau
 
@@ -40,9 +42,10 @@ class ConstantBurstHistory():
         self.end_age = end_age
         self.relative_peak = relative_peak
         self.sigma = sigma
+        self.history = self.get_history_lambda()
 
 
-    def __call__(self):
+    def get_history_lambda(self):
         """Get function describing star formation at age (Gyrs)
         for a population with a constant star formation
         history between start_age and end_age
@@ -75,8 +78,10 @@ class DualBurstHistory():
         self.age_at_current_z = cosmo.age(self.current_z).value - cosmo.age(self.formation_z).value  # Gyrs
         assert self.age_at_current_z - self.second_duration > self.first_duration  # no overlap allowed
 
-    def __call__(self):
-        """Constant starburst at formation and at current z
+        self.history = self.get_history_lambda()
+
+    def get_history_lambda(self):
+        """Constant (smoothed) starburst at formation and at current z
 
         Args:
             current_z (float): observed redshift of galaxy
@@ -95,13 +100,12 @@ class DualBurstHistory():
             start_age=self.age_at_current_z - self.second_duration,
             end_age=self.age_at_current_z)
 
-        return lambda galaxy_age: first_burst(galaxy_age) + second_burst(galaxy_age)
+        return lambda galaxy_age: first_burst.history(galaxy_age) + second_burst.history(galaxy_age)
 
 
 def visualise_model_sfh(model, model_name, formation_z):
     """Display star formation history of model.
     Must have been called with custom star formation (model.make_csp), else model.sfh will be empty.
-    TODO add more (all?) filters to plot, perhaps as a param
     
     Args:
         model (ezgal.ezgal.ezgal): ezgal model with custom star formation history
