@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from find_agn import spectral_fitting
-from find_agn.tests import TEST_FIGURE_DIR 
+from find_agn.tests import TEST_FIGURE_DIR
 
 
 @pytest.fixture()
