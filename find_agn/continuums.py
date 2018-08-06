@@ -11,7 +11,7 @@ class Continuum():
 
     def __init__(self, freq, flux_density, background=None, line_data=None):
      # templates are abstract - once given a specific z (time), becomes specific continuum
-     
+
         self.frequency = freq  # Hz
         self.flux_density = flux_density
 
@@ -19,7 +19,7 @@ class Continuum():
         self.wavelength = 299792458 / self.frequency  # lambda (m) = c (ms^1) / freq (Hz)
 
         # energy density v Fv i.e. 10^-23 erg / s / cm^2
-        self.energy_density = self.flux_density * self.frequency 
+        self.energy_density = self.flux_density * self.frequency
 
         if background is None:
             self.background = None
@@ -66,10 +66,10 @@ class Continuum():
         spec_object = spectral_fitting.load_spectrum(
             self.wavelength * 1e10,  # fitter expects angstroms
             self.flux_density_subtracted)
-    
+
         spectral_fitting.fit_lines(spec_object)  # inplace
         # modifies spec_object inplace and returns data
-        self.line_data = spectral_fitting.measure_line_properties(spec_object)  
+        self.line_data = spectral_fitting.measure_line_properties(spec_object)
         self.spec_object = spec_object  # save for plotting of fit. Note: angstroms!
 
 
@@ -89,7 +89,7 @@ class Continuum():
             ax.set_xlabel('Wavelength (A)')
             ax.set_ylabel('Flux density')
         return fig, (ax0, ax1)
-    
+
 
     def visualise_fit(self):
         fig, (dummy_ax0, dummy_ax1) = plt.subplots(nrows=2)
@@ -112,12 +112,11 @@ def line_data_to_bpt_flux(line_data):
 
     for old_name, bpt_name in lines.items():
         line = line_data[line_data['line'] == old_name].squeeze()
-        assert type(line) == pd.Series
+        assert isinstance(line, pd.Series)
         data[bpt_name] = line['flux']  # or amplitude? Note: can't simply add amplitudes
-        
+
     # add H alpha
     h_alpha_flux = line_data[line_data['line'].isin(['H_alpha', 'H_alpha_1'])]['flux'].sum()
     data['HA_6562'] = h_alpha_flux
 
     return pd.Series(data)
-

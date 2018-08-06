@@ -16,7 +16,7 @@ class ExponentialHistory():
 
     def __init__(self, tau):
         """[summary]
-        
+
         Args:
             tau (float): exponential decay time in Gyrs
         """
@@ -53,7 +53,7 @@ class ConstantBurstHistory():
         Args:
             start_age (np.array): start time of burst (Gyrs)
             end_age (np.array): end time of burst (Gyrs)
-            relative_peak (float, optional): Defaults to 1.. Level of burst SF (EZGAL will normalise)
+            relative_peak (float, optional): Defaults to 1. Level of burst SF (EZGAL will normalise)
             sigma (float): width of smoothing filter. High values cause smoother histories.
 
         Returns:
@@ -75,8 +75,9 @@ class DualBurstHistory():
         self.first_duration = first_duration
         self.second_duration = second_duration
 
-        self.age_at_current_z = cosmo.age(self.current_z).value - cosmo.age(self.formation_z).value  # Gyrs
-        assert self.age_at_current_z - self.second_duration > self.first_duration  # no overlap allowed
+        # Gyrs
+        self.age_at_current_z = cosmo.age(self.current_z).value - cosmo.age(self.formation_z).value
+        assert self.age_at_current_z - self.second_duration > self.first_duration  # no overlap
 
         self.history = self.get_history_lambda()
 
@@ -106,12 +107,12 @@ class DualBurstHistory():
 def visualise_model_sfh(model, model_name, formation_z):
     """Display star formation history of model.
     Must have been called with custom star formation (model.make_csp), else model.sfh will be empty.
-    
+
     Args:
         model (ezgal.ezgal.ezgal): ezgal model with custom star formation history
         model_name (str): name of model, for plot legend only
         formation_z (float): formation redshift of model, for age calculations
-    
+
     Returns:
         matplotlib.figure: matplotlib figure
         tuple: of form (magnitude axis, star formation axis)
@@ -128,7 +129,7 @@ def visualise_model_sfh(model, model_name, formation_z):
     ax0.set_ylabel('Absolute Mag (SDSS u)')
     ax0.legend()
 
-    model_ages_gyr = model.ages * 1e-9  # every calculated age of galaxy, 0 at formation. To Gyr. 
+    model_ages_gyr = model.ages * 1e-9  # every calculated age of galaxy, 0 at formation. To Gyr.
     model_sf_history = model.sfh  # sfh at every age in model.ages
 
     ax1.plot(model_ages_gyr, model_sf_history, 'k--', label=model_name)

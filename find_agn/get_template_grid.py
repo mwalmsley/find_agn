@@ -4,7 +4,7 @@ from find_agn import templates
 # TODO extend to make grids with more dimensions of model assumptions
 def make_metallicity_grid(metallicities, star_history, db, model_dir, save_dir):
     """Make templates over a range of metallicities, save to disk, record in database
-    
+
     Args:
         star_history (star_formation.DualBurstHistory): star history of templates
         metallicities (list): Calculate models with these metallicities

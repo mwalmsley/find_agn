@@ -35,10 +35,9 @@ def ref_dual_burst(formation_z):
         )
 
 
-
-def test_star_formation_profiles(formation_z, ref_exponential, ref_burst, ref_dual_burst):
+def test_star_formation_profiles(ref_exponential, ref_burst, ref_dual_burst):
     # note that universe is not 8 + 15 Gyr old, just to explore
-    galaxy_ages = np.linspace(0., 15., 1000) 
+    galaxy_ages = np.linspace(0., 15., 1000)
     plt.plot(galaxy_ages, ref_exponential.history(galaxy_ages), label='Exponential')
     plt.plot(galaxy_ages, ref_burst.history(galaxy_ages), label='Burst')
     plt.plot(galaxy_ages, ref_dual_burst.history(galaxy_ages), label='Dual Burst')

@@ -26,10 +26,10 @@ def test_make_metallicity_grid(
 
     # for fixed model assumptions, look at one model over many ages/history snapshots
     get_template_grid.make_metallicity_grid(
-        metallicity_range, 
-        star_history, 
-        empty_db, 
-        model_dir, 
+        metallicity_range,
+        star_history,
+        empty_db,
+        model_dir,
         save_dir
     )
 

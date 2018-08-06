@@ -47,12 +47,12 @@ TARGET_LINES = [
 
 def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
     """[summary]
-    
+
     Args:
         raw_spectral_data ([type]): [description]
         data_loc ([type], optional): Defaults to None. [description]
         figure_loc ([type], optional): Defaults to None. [description]
-    
+
     Returns:
         [type]: [description]
     """
@@ -90,11 +90,11 @@ def find_emission_lines(raw_spectral_data, data_loc=None, figure_loc=None):
 
 def sanity_check_spectral_data(spectrum, normalisation=1.):
     """Normalise and trim spectrum
-    
+
     Args:
         spectrum ([type]): [description]
         normalisation ([type], optional): Defaults to 1.. [description]
-    
+
     Returns:
         [type]: [description]
     """
@@ -112,16 +112,14 @@ def sanity_check_spectral_data(spectrum, normalisation=1.):
 
 def fit_background(spectrum, smoothing_frac=0.12):
     """[summary]
-    
+
     Args:
-        spectrum ([type]): [description]
-    
     Returns:
         pd.DataFrame: [description]
     """
     # fit continuum from spectrum, excluding the Ha region
     continuum = fit_lowess_continuum(
-        spectrum, 
+        spectrum,
         smoothing_frac,
         excluded=[(6562-10, 6562+10)])
     # continuum is not returned

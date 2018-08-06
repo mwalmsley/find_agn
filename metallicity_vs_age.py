@@ -20,22 +20,22 @@ def make_new_grid(metallicities, star_history, model_dir, save_dir, db_loc):
                     metallicity FLOAT,
                     imf FLOAT,
                     current_z FLOAT,
-                    formation_z FLOAT, 
-                    first_duration FLOAT, 
+                    formation_z FLOAT,
+                    first_duration FLOAT,
                     second_duration FLOAT)
                         ''')
     db.commit()
 
     get_template_grid.make_metallicity_grid(
-        metallicities, 
+        metallicities,
         star_history,
-        db, 
+        db,
         model_dir,
         save_dir
     )
 
     db.close()
-        
+
 
 if __name__ == '__main__':
 
@@ -75,13 +75,13 @@ if __name__ == '__main__':
             lines['redshift'] = redshift
             lines['metallicity'] = template.metallicity
             all_bpt_lines.append(lines)
-        
+
 
             if visualise:
                 fig_name = '{}_{}'.format(redshift, template.metallicity)
 
                 fig, _ = star_formation.visualise_model_sfh(
-                    template.model, 
+                    template.model,
                     fig_name,
                     template.formation_z)
                 fig.savefig('temp/history/' + fig_name + '_history.png')

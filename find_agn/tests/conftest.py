@@ -1,11 +1,9 @@
-import os
 import sqlite3
 import copy
 
 import pytest
 import numpy as np
 import scipy
-from astropy import units
 
 from find_agn import star_formation, templates, spectral_fitting, continuums, tests
 
@@ -108,10 +106,10 @@ def calculated_template(ref_template, calculated_ezgal_model):
 
 @pytest.fixture
 def calculated_ezgal_model():
-    return mockCalculatedModel()
+    return MockCalculatedModel()
 
 
-class mockCalculatedModel():  # mock EzGal model to save
+class MockCalculatedModel():  # mock EzGal model to save
     def save_model(self, save_loc, filter_info):
         with open(save_loc, 'w') as f:
             f.write('Hello, I am a saved model')
