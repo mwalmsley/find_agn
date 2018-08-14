@@ -20,3 +20,4 @@ population_models
 *.pyc
 temp/*
 template_database/*
+*egg*
