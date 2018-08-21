@@ -51,8 +51,17 @@ def lines_to_params(param_cols):
 
 
 @pytest.fixture()
-def diagnostic_model_unfit(grid_df, galaxies, line_cols, param_cols):
-    return backward_forward_model.DiagnosticModel(grid_df, galaxies, line_cols, param_cols)
+def mappings_grid(monkeypatch, grid_df, line_cols, param_cols, lines_to_params, params_to_lines):
+    def mock_fit(self):
+        self.lines_to_params = lines_to_params
+        self.params_to_lines = params_to_lines
+    monkeypatch.setattr(backward_forward_model.MappingsGrid, 'fit', mock_fit)
+    return backward_forward_model.MappingsGrid(grid_df, line_cols, param_cols)
+
+
+@pytest.fixture()
+def diagnostic_model_unfit(grid_df, galaxies, line_cols, param_cols, mappings_grid):
+    return backward_forward_model.DiagnosticModel(grid_df, galaxies, line_cols, param_cols, mappings_grid)
 
 
 @pytest.fixture()

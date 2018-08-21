@@ -74,6 +74,10 @@ class MappingsGrid():
         # hard also because pairs of params do not define predicted line
 
 
+    def save(self, save_loc):
+        raise NotImplementedError
+
+
 class DiagnosticModel():
 
     def __init__(self, grid, galaxies, line_cols, param_cols, mappings_grid):
