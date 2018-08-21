@@ -9,4 +9,6 @@ datashader
 bokeh
 holoviews
 pytest
-pyspecfit
+pyspeckit
+statsmodels
+pytest-cov

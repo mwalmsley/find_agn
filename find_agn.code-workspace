@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.pythonPath": "/anaconda3/envs/py36/bin/python"
+	}
 }
