@@ -339,19 +339,21 @@ def estimate_param_prior(df, param_cols):
 
 if __name__ == '__main__':
     line_cols = ['log_NII_HA', 'log_OIII_HB']
-    param_cols = ['log U', 'log P/k', '12 + log O/H']
-    grid_loc = os.path.join('find_agn/tests/test_examples/NB_HII_grid.fits')
+    # param_cols = ['log U', 'log P/k', '12 + log O/H']
+    param_cols = ['log U', 'log P/k', '12 + log O/H']  # TODO add e peak
+    grid_loc = os.path.join('data/nebulabayes/NB_NLR_grid.fits')
     # all grid points are useful so include all
     grid = grid_to_bpt_data(grid_loc).dropna(how='any', subset=line_cols)
     mappings_grid = MappingsGrid(grid, line_cols, param_cols)
-    mappings_grid.describe('figures/first_grid')
+    mappings_grid.describe('figures/agn_grid')
 
     galaxies = pd.read_csv(
         'bpt_df.csv', nrows=1000)
     galaxies = bpt_utilities.normalize_to_hbeta(galaxies)
 
     # only include BPT-region starforming galaxies for P
-    galaxies = galaxies[galaxies['galaxy_type'] == 'starforming']
+    # galaxies = galaxies[galaxies['galaxy_type'] == 'starforming']
+    galaxies = galaxies[galaxies['galaxy_type'] == 'seyfert']
     galaxies = bpt_utilities.zoom_bpt_diagram(galaxies)
 
     model = DiagnosticModel(grid, galaxies, line_cols, param_cols, mappings_grid)
