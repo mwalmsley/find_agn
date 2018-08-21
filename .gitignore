@@ -11,7 +11,7 @@ node_modules
 *.DS_Store
 *.model
 models/ezgal_models/index.html
-bpt_df.csv
+*.csv
 *.zip
 catalogs/*
 *.hdf5
