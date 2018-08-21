@@ -13,7 +13,7 @@ models/ezgal_models/index.html
 *.csv
 *.html
 population_models
-*easyGalaxy/*
+easyGalaxy/*
 !find_agn/tests/test_examples
 !find_agn/tests/test_figures
 *__pycache__*
@@ -21,3 +21,5 @@ population_models
 temp/*
 template_database/*
 *egg*
+models/*
+catalogs/*
